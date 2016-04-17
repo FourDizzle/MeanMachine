@@ -14,7 +14,8 @@ the person standing in front of a webcam.
 - Java JDK 1.8
 
 ## Build Instructions
-1. Follow all instructions to build OpenCV 3.1.0 to generate the jar opencv-310.jar
+1. Follow all instructions to build OpenCV 3.1.0 with opencv_contrib 3.1.0 to 
+   generate the jar opencv-310.jar
 2. In the directory where that jar resides run:
 ```
 mvn install:install-file \
