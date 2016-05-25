@@ -13,8 +13,6 @@ import org.opencv.core.Size;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 
-import us.superkill.mean_machine.imagetools.FaceDetector;
-
 public class FaceFinder extends FaceDetector {
 	
 	private static final Logger log = LogManager.getLogger(FaceFinder.class);

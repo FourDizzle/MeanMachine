@@ -10,6 +10,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 
+import us.superkill.mean_machine.detect.FaceDetector;
+
 public class HaarFaceDetector extends FaceDetector {
 	
 	private static final Logger log = 

@@ -10,9 +10,10 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import us.superkill.mean_machine.detect.EyeFinder;
-import us.superkill.mean_machine.detect.PupilFinder;
-import us.superkill.mean_machine.exceptions.TrainerTargetNotFound;
+import us.superkill.mean_machine.detect.FaceDetector;
+import us.superkill.mean_machine.exceptions.FormatterTargetNotFound;
+import us.superkill.mean_machine.eyelike.EyeFinder;
+import us.superkill.mean_machine.eyelike.PupilFinder;
 
 public class EyeLikeFacePreparer extends RecognizerPreparer {
 	
@@ -40,10 +41,10 @@ public class EyeLikeFacePreparer extends RecognizerPreparer {
 	}
 	
 	private static Point testAndRescalePupil(Point pupil, Rect eye) 
-			throws TrainerTargetNotFound {
+			throws FormatterTargetNotFound {
 		log.debug("Rescalling pupil coordinates");
 		if (pupil.x == 0.0 && pupil.y == 0.0) {
-			throw new TrainerTargetNotFound("Pupil not found");
+			throw new FormatterTargetNotFound("Pupil not found");
 		}
 		Point offset = eye.tl();
 		return new Point(pupil.x + offset.x, pupil.y + offset.y);
@@ -116,13 +117,13 @@ public class EyeLikeFacePreparer extends RecognizerPreparer {
 
 	@Override
 	public Mat prepare(Mat image, Point centerOfFace) 
-			throws TrainerTargetNotFound {
+			throws FormatterTargetNotFound {
 		Rect face = findTargetFace(image, centerOfFace);
 		Mat preparedImage = crop(image, face);
 		return preparedImage;
 	}
 	
-	private Mat crop(Mat image, Rect face) throws TrainerTargetNotFound {
+	private Mat crop(Mat image, Rect face) throws FormatterTargetNotFound {
 		Mat croppedImage = new Mat();
 		
 		log.debug("Finding pupils.");
@@ -165,8 +166,14 @@ public class EyeLikeFacePreparer extends RecognizerPreparer {
 	}
 	
 	private Point[] findPupils(Mat image, Rect face) 
-			throws TrainerTargetNotFound {
+			throws FormatterTargetNotFound {
 		Rect[] eyes = EyeFinder.findEyes(image, face);
+		
+		if (DEBUG) {
+			for (Rect eye: eyes) {
+				Imgproc.rectangle(image, eye.br(), eye.tl(), new Scalar(255, 0, 0));
+			}
+		}
 		
 		Point rightPupil = 
 				PupilFinder.findEyeCenter(image.submat(face), eyes[0]);
@@ -186,7 +193,7 @@ public class EyeLikeFacePreparer extends RecognizerPreparer {
 	}
 	
 	private Rect findTargetFace(Mat image, Point centerOfFace) 
-			throws TrainerTargetNotFound {
+			throws FormatterTargetNotFound {
 		Rect[] allFaces = faceDetector.detectFaces(image);
 		Rect targetFace = null;
 		
@@ -197,7 +204,7 @@ public class EyeLikeFacePreparer extends RecognizerPreparer {
 		}
 		
 		if (targetFace == null) {
-			throw new TrainerTargetNotFound("No face found at target Point");
+			throw new FormatterTargetNotFound("No face found at target Point");
 		}
 		return targetFace;
 	}

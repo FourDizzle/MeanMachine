@@ -17,7 +17,7 @@
 		<property name="hibernate.current_session_context_class">thread</property>
         <!-- Database connection settings -->
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost/mean_machine?useSSL=false</property>
+        <property name="connection.url">jdbc:mysql://localhost/meanmachine?useSSL=false</property>
         <property name="connection.username">root</property>
         <property name="connection.password"></property>
 
@@ -37,8 +37,9 @@
         <property name="hbm2ddl.auto">create</property> -->
 
         <!-- Names the annotated entity class -->
-        <mapping class="us.superkill.mean_machine.db.Friend"/>
-        <mapping class="us.superkill.mean_machine.db.FriendPhoto"/>
+        <mapping class="us.superkill.mean_machine.identity.Identity"/>
+        <mapping class="us.superkill.mean_machine.identity.Photo"/>
+        <mapping class="us.superkill.mean_machine.identity.Post"/>
 
     </session-factory>
 

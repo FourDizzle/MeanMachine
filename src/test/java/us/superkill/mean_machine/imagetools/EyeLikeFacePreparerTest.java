@@ -16,7 +16,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import us.superkill.mean_machine.exceptions.TrainerTargetNotFound;
+import us.superkill.mean_machine.exceptions.FormatterTargetNotFound;
 
 public class EyeLikeFacePreparerTest {
 	
@@ -36,7 +36,7 @@ public class EyeLikeFacePreparerTest {
 		
 		try {
 			preparedImage = preparer.prepare(image, faceTarget);
-		} catch (TrainerTargetNotFound e) {
+		} catch (FormatterTargetNotFound e) {
 			System.out.println(e.getMessage());
 		}
 		
