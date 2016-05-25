@@ -1,20 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.superkill</groupId>
   <artifactId>mean-machine</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Mean Machine</name>
-  
+
   <properties>
-    <javacpp.platform.oldcompiler>${javacpp.platform.compiler}</javacpp.platform.oldcompiler>
+    <java.compiler.version>1.8</java.compiler.version>
+    <javacpp.version>1.2</javacpp.version>
+    <opencv.version>3.1.0</opencv.version>
+    <flandmark.version>1.07</flandmark.version>
   </properties>
-  
+
   <dependencies>
-<!--     <dependency>
-      <groupId>org.opencv</groupId>
-      <artifactId>opencv-java</artifactId>
-      <version>3.1.0</version>
-    </dependency> -->
     <dependency>
 	  <groupId>com.restfb</groupId>
 	  <artifactId>restfb</artifactId>
@@ -46,41 +45,47 @@
       <version>2.5</version>
     </dependency>
     <dependency>
-	  <groupId>org.bytedeco.javacpp-presets</groupId>
-	  <artifactId>opencv</artifactId>
-	  <version>3.1.0-1.2</version>
-	  <classifier>macosx-x86_64</classifier>
-	</dependency>
-	<dependency>
-	  <groupId>org.bytedeco</groupId>
-	  <artifactId>javacpp</artifactId>
-	  <version>1.2</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.bytedeco</groupId>
-	  <artifactId>javacv</artifactId>
-	  <version>1.2</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.bytedeco.javacpp-presets</groupId>
-	  <artifactId>opencv</artifactId>
-	  <version>3.1.0-1.2</version>
-	</dependency>
-<!-- 	<dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacpp</artifactId>
+      <version>${javacpp.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacv</artifactId>
+      <version>${javacpp.version}</version>
+    </dependency>
+    <dependency>
+  	  <groupId>org.bytedeco.javacpp-presets</groupId>
+  	  <artifactId>opencv</artifactId>
+  	  <version>${opencv.version}-${javacpp.version}</version>
+  	  <classifier>${compiler.platform}</classifier>
+  	</dependency>
+    <!-- Will be using to find face landmarks soon
+    <dependency>
       <groupId>org.bytedeco.javacpp-presets</groupId>
       <artifactId>flandmark</artifactId>
-      <version>1.07-1.2</version>
-	</dependency> -->
-	<dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.11</version>
-	  <scope>test</scope>
-	</dependency>
+      <version>${flandmark.version}-${javacpp.version}</version>
+  	</dependency>
+  	-->
+  	<dependency>
+  	  <groupId>junit</groupId>
+  	  <artifactId>junit</artifactId>
+  	  <version>4.11</version>
+  	  <scope>test</scope>
+  	</dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Specify JRE/JDK -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.compiler.version}</source>
+          <target>${java.compiler.version}</target>
+        </configuration>
+      </plugin>
+      <!-- makes Jar executable -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -101,25 +106,58 @@
           </execution>
         </executions>
       </plugin>
-      
-      <plugin>
-        <groupId>org.bytedeco</groupId>
-        <artifactId>javacpp</artifactId>
-        <configuration>
-          <propertyKeysAndValues>
-            <property>
-              <name>platform.root</name>
-              <value>${javacpp.platform.root}</value>
-            </property>
-            <property>
-              <name>platform.compiler</name>
-              <value>${javacpp.platform.oldcompiler}</value>
-            </property>
-          </propertyKeysAndValues>
-        </configuration>
-      </plugin>
-      
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>macosx-x86_64</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+        <compiler.platform>macosx-x86_64</compiler.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>linux-x86_64</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <compiler.platform>linux-x86_64</compiler.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows-x86_64</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <compiler.platform>windows-x86_64</compiler.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows-x86</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+        <compiler.platform>windows-x86</compiler.platform>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
