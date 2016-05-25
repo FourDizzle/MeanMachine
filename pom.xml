@@ -8,6 +8,7 @@
 
   <properties>
     <java.compiler.version>1.8</java.compiler.version>
+    <platform.name>${os.name}-${os.arch}</platform.name>
     <javacpp.version>1.2</javacpp.version>
     <opencv.version>3.1.0</opencv.version>
     <flandmark.version>1.07</flandmark.version>
@@ -58,13 +59,14 @@
   	  <groupId>org.bytedeco.javacpp-presets</groupId>
   	  <artifactId>opencv</artifactId>
   	  <version>${opencv.version}-${javacpp.version}</version>
-  	  <classifier>${compiler.platform}</classifier>
+  	  <classifier>${platform.name}</classifier>
   	</dependency>
     <!-- Will be using to find face landmarks soon
     <dependency>
       <groupId>org.bytedeco.javacpp-presets</groupId>
       <artifactId>flandmark</artifactId>
       <version>${flandmark.version}-${javacpp.version}</version>
+      <classifier>${platform.name}</classifier>
   	</dependency>
   	-->
   	<dependency>
@@ -109,53 +111,87 @@
     </plugins>
   </build>
 
+  <!-- determines platform for platform specific dependencies -->
   <profiles>
     <profile>
-      <id>macosx-x86_64</id>
+      <id>linux</id>
       <activation>
-        <os>
-          <family>mac</family>
-          <arch>x86_64</arch>
-        </os>
+        <os><name>linux</name></os>
       </activation>
       <properties>
-        <compiler.platform>macosx-x86_64</compiler.platform>
+        <os.name>linux</os.name>
       </properties>
     </profile>
     <profile>
-      <id>linux-x86_64</id>
+      <id>macosx</id>
       <activation>
-        <os>
-          <family>unix</family>
-          <arch>amd64</arch>
-        </os>
+        <os><name>mac os x</name></os>
       </activation>
       <properties>
-        <compiler.platform>linux-x86_64</compiler.platform>
+        <os.name>macosx</os.name>
       </properties>
     </profile>
     <profile>
-      <id>windows-x86_64</id>
+      <id>windows</id>
       <activation>
-        <os>
-          <family>windows</family>
-          <arch>amd64</arch>
-        </os>
+        <os><family>windows</family></os>
       </activation>
       <properties>
-        <compiler.platform>windows-x86_64</compiler.platform>
+        <os.name>windows</os.name>
       </properties>
     </profile>
     <profile>
-      <id>windows-x86</id>
+      <id>i386</id>
       <activation>
-        <os>
-          <family>windows</family>
-          <arch>x86</arch>
-        </os>
+        <os><arch>i386</arch></os>
       </activation>
       <properties>
-        <compiler.platform>windows-x86</compiler.platform>
+        <os.arch>x86</os.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>i486</id>
+      <activation>
+        <os><arch>i486</arch></os>
+      </activation>
+      <properties>
+        <os.arch>x86</os.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>i586</id>
+      <activation>
+        <os><arch>i586</arch></os>
+      </activation>
+      <properties>
+        <os.arch>x86</os.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>i686</id>
+      <activation>
+        <os><arch>i686</arch></os>
+      </activation>
+      <properties>
+        <os.arch>x86</os.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>amd64</id>
+      <activation>
+        <os><arch>amd64</arch></os>
+      </activation>
+      <properties>
+        <os.arch>x86_64</os.arch>
+      </properties>
+    </profile>
+    <profile>
+      <id>x86-64</id>
+      <activation>
+        <os><arch>x86-64</arch></os>
+      </activation>
+      <properties>
+        <os.arch>x86_64</os.arch>
       </properties>
     </profile>
   </profiles>
