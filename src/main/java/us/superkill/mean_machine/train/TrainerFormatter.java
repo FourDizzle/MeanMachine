@@ -1,7 +1,7 @@
 package us.superkill.mean_machine.train;
 
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
+import org.bytedeco.javacpp.opencv_core.Point;
+import org.bytedeco.javacpp.opencv_core.Rect;
 
 import us.superkill.mean_machine.detect.FaceDetector;
 import us.superkill.mean_machine.exceptions.FormatterTargetNotFound;

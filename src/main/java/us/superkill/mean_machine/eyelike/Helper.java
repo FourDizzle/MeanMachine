@@ -1,17 +1,32 @@
 package us.superkill.mean_machine.eyelike;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+
+import static org.bytedeco.javacpp.opencv_core.CV_64F;
+
+import org.bytedeco.javacpp.opencv_core.Mat;
 
 public class Helper {
 	
+//	public static Mat matrixMagnitude(Mat matX, Mat matY) {
+//		Mat mags = new Mat(matX.rows(), matX.cols(), CV_64F);
+//		for (int y = 0; y < matX.rows(); ++y) {
+//			for(int x = 0; x < matX.cols(); ++x) {
+//				double gX = matX.get(y, x)[0];
+//				double gY = matY.get(y, x)[0];
+//				double magnitude = Math.sqrt((gX * gX) + (gY * gY));
+//				mags.put(y, x, magnitude);
+//			}
+//		}
+//		return mags;
+//	}
+	
 	public static Mat matrixMagnitude(Mat matX, Mat matY) {
-		Mat mags = new Mat(matX.rows(), matX.cols(), CvType.CV_64F);
+		Mat mags = new Mat(matX.rows(), matX.cols(), CV_64F);
 		for (int y = 0; y < matX.rows(); ++y) {
 			for(int x = 0; x < matX.cols(); ++x) {
-				double gX = matX.get(y, x)[0];
-				double gY = matY.get(y, x)[0];
+				double gX = matX.ptr(y, x).get();
+				double gY = matY.ptr(y, x).get();
 				double magnitude = Math.sqrt((gX * gX) + (gY * gY));
-				mags.put(y, x, magnitude);
+				mags.ptr(y, x).put((byte) magnitude);
 			}
 		}
 		return mags;
@@ -32,7 +47,7 @@ public class Helper {
 		
 		for (int y = 0; y < mat.rows() - 1; ++y) {
 			for (int x = 0; x < mat.cols() - 1; ++x) {
-				sum += mat.get(y, x)[0];
+				sum += mat.ptr(y, x).get();
 			}
 		}
 		
@@ -46,7 +61,8 @@ public class Helper {
 		
 		for (int y = 0; y < mat.rows() - 1; ++y) {
 			for (int x = 0; x < mat.cols() - 1; ++x) {
-				sum += (mat.get(y, x)[0] - mean) * (mat.get(y, x)[0] - mean);
+				int a = mat.ptr(y, x).get();
+				sum += (a - mean) * (a - mean);
 			}
 		}
 		

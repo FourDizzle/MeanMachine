@@ -1,47 +1,51 @@
 package us.superkill.mean_machine.eyelike;
 
-import static us.superkill.mean_machine.eyelike.DetectConfig.*;
+import static org.bytedeco.javacpp.opencv_core.CV_64F;
+import static org.bytedeco.javacpp.opencv_core.minMaxLoc;
+import static org.bytedeco.javacpp.opencv_core.split;
+import static org.bytedeco.javacpp.opencv_imgproc.GaussianBlur;
+import static org.bytedeco.javacpp.opencv_imgproc.resize;
+import static us.superkill.mean_machine.eyelike.DetectConfig.kEnableWeight;
+import static us.superkill.mean_machine.eyelike.DetectConfig.kFastEyeWidth;
+import static us.superkill.mean_machine.eyelike.DetectConfig.kGradientThreshold;
+import static us.superkill.mean_machine.eyelike.DetectConfig.kWeightBlurSize;
+import static us.superkill.mean_machine.eyelike.DetectConfig.kWeightDivisor;
 import static us.superkill.mean_machine.eyelike.Helper.computeDynamicThreshold;
 import static us.superkill.mean_machine.eyelike.Helper.matrixMagnitude;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacpp.opencv_core.Point;
+import org.bytedeco.javacpp.opencv_core.Rect;
+import org.bytedeco.javacpp.opencv_core.Size;
 
 public class PupilFinder {
 	
 	private static final Logger log = LogManager.getLogger(PupilFinder.class);
 	
 	private static Point unscalePoint(Point p, Rect origSize) {
-		float ratio = (((float)kFastEyeWidth)/origSize.width);
-		int x = (int) Math.round(p.x / ratio);
-		int y = (int) Math.round(p.y / ratio);
+		float ratio = (((float)kFastEyeWidth)/origSize.width());
+		int x = (int) Math.round(p.x() / ratio);
+		int y = (int) Math.round(p.y() / ratio);
 		
 		return new Point(x, y);
 	}
 	
 	private static Mat scaleToFastSize(Mat src) {
-		Imgproc.resize(src, src, 
+		resize(src, src, 
 				new Size(kFastEyeWidth, 
-						((double) kFastEyeWidth/src.cols()) * src.rows()));
+						(kFastEyeWidth/src.cols()) * src.rows()));
 		return src;
 	}
 	
 	private static Mat computeMatXGradient(Mat mat) {
-		Mat output = new Mat(mat.rows(), mat.cols(), CvType.CV_64F);
+		Mat output = new Mat(mat.rows(), mat.cols(), CV_64F);
 		for(int y = 0; y < mat.rows(); y++) {
-			output.put(y,0, mat.get(y,1)[0] - mat.get(y,0)[0]);
+			output.ptr(y,0).put((byte)(mat.ptr(y,1).get() - mat.ptr(y,0).get()));
 			for(int x = 1; x < mat.cols() - 1; x++) {
-				output.put(y,x, (mat.get(y,x+1)[0] - mat.get(y,x-1)[0])/2.0);
+				output.ptr(y,x).put((byte)((mat.ptr(y,x+1).get() - mat.ptr(y,x-1).get())/2.0));
 			}
 		}
 		return output;
@@ -65,13 +69,13 @@ public class PupilFinder {
 					dotProduct = Math.max(0.0, dotProduct);
 					//square and multiply by the weight
 					if (kEnableWeight) {
-						out.put(cy, cx, 
-								out.get(cy, cx)[0]
+						out.ptr(cy, cx).put((byte)
+								(out.ptr(cy, cx).get()
 									+ dotProduct * dotProduct
-									* (weight.get(cy, cx)[0]/kWeightDivisor));
+									* (weight.ptr(cy, cx).get()/kWeightDivisor)));
 					} else {
-						out.put(cy, cx, 
-								out.get(cy, cx)[0] + dotProduct * dotProduct);
+						out.ptr(cy, cx).put((byte) 
+								(out.ptr(cy, cx).get() + dotProduct * dotProduct));
 					}
 				}
 			}
@@ -80,19 +84,18 @@ public class PupilFinder {
 	}
 	
 	public static Point findEyeCenter(Mat face, Rect eye) {
-		
-		Mat eyeROIUnscaled = face.submat(eye);
+		Mat eyeROIUnscaled = new Mat(face, eye);
 		Mat eyeROI = scaleToFastSize(eyeROIUnscaled);
 		
 		//Convert to grayscale
-		List<Mat> rgbChannels = new ArrayList<Mat>();
-		Core.split(eyeROI, rgbChannels);
+		MatVector rgbChannels = new MatVector();
+		split(eyeROI, rgbChannels);
 		eyeROI = rgbChannels.get(2);
 //		Imgproc.cvtColor(eyeROI, eyeROI, Imgproc.COLOR_RGB2GRAY);
 		
 		//Find the gradient
 		Mat gradientX = computeMatXGradient(eyeROI);
-		Mat gradientY = computeMatXGradient(eyeROI.t()).t();
+		Mat gradientY = computeMatXGradient(eyeROI.t().asMat()).t().asMat();
 		
 		// Normalize and threshold the gradient
 		// compute all the magnitudes
@@ -105,34 +108,31 @@ public class PupilFinder {
 		//normalize
 		for (int y = 0; y < eyeROI.rows(); ++y) {
 			for(int x = 0; x < eyeROI.cols(); ++x) {
-				double gX = gradientX.get(y, x)[0];
-				double gY = gradientY.get(y, x)[0];
-				double magnitude = mags.get(y, x)[0];
+				double gX = gradientX.ptr(y, x).get();
+				double gY = gradientY.ptr(y, x).get();
+				double magnitude = mags.ptr(y, x).get();
 				if (magnitude > gradientThresh) {
-					gradientX.put(y, x, gX/magnitude);
-					gradientY.put(y, x, gY/magnitude);
+					gradientX.ptr(y, x).put((byte) (gX/magnitude));
+					gradientY.ptr(y, x).put((byte) (gY/magnitude));
 				} else {
-					gradientX.put(y, x, 0.0);
-					gradientY.put(y, x, 0.0);
+					gradientX.ptr(y, x).put((byte) 0.0);
+					gradientY.ptr(y, x).put((byte) 0.0);
 				}
 			}
 		}
 		
 		// Create a blurred and inverted image for weighting
 		Mat weight = new Mat();
-		
-		Imgproc.GaussianBlur(eyeROI,
-				             weight,
-				             new Size(kWeightBlurSize, kWeightBlurSize),
-				             0, 0);
+		GaussianBlur(eyeROI, 
+				weight, new Size(kWeightBlurSize, kWeightBlurSize), 0.0);
 		for (int y = 0; y < weight.rows(); y++) {
 			for (int x = 0; x < weight.cols(); x++) {
-				weight.put(y, x, 255 - weight.get(y, x)[0]);
+				weight.ptr(y, x).put((byte)(255 - weight.ptr(y, x).get()));
 			}
 		}
 		
 		 //-- Run the algorithm!
-		Mat outSum = Mat.zeros(eyeROI.rows(), eyeROI.cols(), CvType.CV_64F);
+		Mat outSum = Mat.zeros(eyeROI.rows(), eyeROI.cols(), CV_64F).asMat();
 		// for each possible gradient location
 		// Note: these loops are reversed from the way the paper does them
 		// it evaluates every possible center for each gradient location instead of
@@ -140,8 +140,8 @@ public class PupilFinder {
 		log.debug("Eye Size: " + outSum.rows() + "x" + outSum.cols());
 		for (int y = 0; y < weight.rows(); y++) {
 			for (int x = 0; x < weight.cols(); x++) {
-				double gX = gradientX.get(y, x)[0];
-				double gY = gradientY.get(y, x)[0];
+				double gX = gradientX.ptr(y, x).get();
+				double gY = gradientY.ptr(y, x).get();
 				if ((gX == 0.0 && gY == 0.0) == false) {
 					outSum = testPossibleCentersFormula(
 							x, y, weight, gX, gY, outSum);
@@ -152,13 +152,19 @@ public class PupilFinder {
 		// scale all the values down, basically averaging them
 		double numGradients = (weight.rows()*weight.cols());
 		Mat out = new Mat();
-		outSum.convertTo(out, CvType.CV_64F, 1.0/numGradients);
+		outSum.convertTo(out, CV_64F, 1.0/numGradients, 0.0);
 		
 		// find the maximum point
-		Core.MinMaxLocResult outMinMaxLocResult = Core.minMaxLoc(out);
-		Point maxP = outMinMaxLocResult.maxLoc;
+//		MinMaxLocResult outMinMaxLocResult = Core.minMaxLoc(out);
+		Point minLoc = new Point();
+		Point maxLoc = new Point();
+		double[] minVal = {0.0};
+		double[] maxVal = {0.0};
+		Mat mask = new Mat(out.size());
+		minMaxLoc(out, minVal, maxVal, minLoc, maxLoc, null);
+//		Point maxP = outMinMaxLocResult.maxLoc;
 //		double maxVal = outMinMaxLocResult.maxVal;
 		
-		return unscalePoint(maxP, eye);
+		return unscalePoint(maxLoc, eye);
 	}
 }

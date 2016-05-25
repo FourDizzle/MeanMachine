@@ -9,9 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.bytedeco.javacpp.opencv_core.Mat;
 import org.hibernate.annotations.GenericGenerator;
-import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
+
+import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
 /**
  * Represents a single photo of an identity and the "photos" table.
@@ -36,8 +37,8 @@ public class Photo implements Serializable {
 	@Transient
 	public void setImage(Mat image) {
 		this.image = image;
-		this.setWidth(image.width());
-		this.setHeight(image.height());
+		this.setWidth(image.cols());
+		this.setHeight(image.rows());
 	}
 	
 	/**
@@ -57,7 +58,7 @@ public class Photo implements Serializable {
 			throw 
 			new NullPointerException("No filename specified to save with");
 		}
-		Imgcodecs.imwrite(directoryPath + "/" + this.fileName, this.image);
+		imwrite(directoryPath + "/" + this.fileName, this.image);
 	}
 	
 	

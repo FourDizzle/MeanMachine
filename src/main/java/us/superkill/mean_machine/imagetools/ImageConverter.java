@@ -1,21 +1,18 @@
 package us.superkill.mean_machine.imagetools;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
+
+import org.bytedeco.javacpp.opencv_core.Mat;
 
 public class ImageConverter {
 	
 	public Mat byteArrayToMat(byte[] image, int width, int height) {
-		Mat mat = new Mat(width, height, CvType.CV_8UC3);
-		mat.put(0, 0, image);
+		Mat mat = new Mat(width, height, CV_8UC3);
+		mat.data().put(image);
 		return mat;
 	}
 	
 	public byte[] matToByteArray(Mat image) {
-		long size = image.total() * image.channels();
-		byte[] buffer = new byte[(int)size];
-		image.get(0, 0, buffer);
-		
-		return buffer;
+		return image.data().asByteBuffer().array();
 	}
 }

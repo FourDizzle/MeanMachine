@@ -1,14 +1,17 @@
 package us.superkill.mean_machine.imagetools;
 
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.equalizeHist;
+import static org.bytedeco.javacpp.opencv_objdetect.CASCADE_SCALE_IMAGE;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.objdetect.Objdetect;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Rect;
+import org.bytedeco.javacpp.opencv_core.RectVector;
+import org.bytedeco.javacpp.opencv_core.Size;
+import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
 import us.superkill.mean_machine.detect.FaceDetector;
 
@@ -19,10 +22,10 @@ public class HaarFaceDetector extends FaceDetector {
 	
 	public Rect[] detectFaces(Mat image) {
 		
-		MatOfRect faces = new MatOfRect();
+		RectVector faces = new RectVector();
 		Mat gray = new Mat();
-		Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
-		Imgproc.equalizeHist(gray, gray);
+		cvtColor(image, gray, COLOR_BGR2GRAY);
+		equalizeHist(gray, gray);
 		int absoluteFaceSize = 0;
 		if (absoluteFaceSize == 0) {
 		    int dheight = gray.rows();
@@ -33,13 +36,19 @@ public class HaarFaceDetector extends FaceDetector {
 		
 		CascadeClassifier faceCascade = new CascadeClassifier("/Users/ncassiani/Projects/MeanMachine/mean-machine/src/main/resources/haarcascades/haarcascade_frontalface_alt.xml");
 		
-		faceCascade.detectMultiScale(gray, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+		faceCascade.detectMultiScale(gray, faces, 1.1, 2, 0 | CASCADE_SCALE_IMAGE,
 				new Size(absoluteFaceSize, absoluteFaceSize), new Size());
-		Rect[] facesArray = faces.toArray();
-		log.debug(facesArray.length + " potential matches.");
+		Rect[] faceArray = new Rect[faces.sizeof()];
+		for (int i = 0; i < faces.sizeof(); i++) {
+			faceArray[i] = faces.get(i);
+		}
+		log.debug(faceArray.length + " potential matches.");
 //		for(int i = 0; i < facesArray.length; i++) {
 //			Imgproc.rectangle(image, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
 //		}
-		return facesArray;
+		
+		faceCascade.close();
+		
+		return faceArray;
 	}
 }

@@ -1,17 +1,16 @@
 package us.superkill.mean_machine.detect;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.bytedeco.javacpp.opencv_core.split;
+import static org.bytedeco.javacpp.opencv_objdetect.CASCADE_SCALE_IMAGE;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.objdetect.Objdetect;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacpp.opencv_core.Rect;
+import org.bytedeco.javacpp.opencv_core.RectVector;
+import org.bytedeco.javacpp.opencv_core.Size;
+import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
 public class FaceFinder extends FaceDetector {
 	
@@ -26,9 +25,9 @@ public class FaceFinder extends FaceDetector {
 	public Rect[] detectFaces(Mat image) {
 		log.debug("Looking for faces.");
 		
-		MatOfRect faces = new MatOfRect();
-		List<Mat> rgbChannels = new ArrayList<Mat>(3);
-		Core.split(image, rgbChannels);
+		RectVector faces = new RectVector();
+		MatVector rgbChannels = new MatVector();
+		split(image, rgbChannels);
 		
 		Mat imageGray = rgbChannels.get(2);
 		
@@ -37,11 +36,15 @@ public class FaceFinder extends FaceDetector {
 				faces, 
 				1.1, 
 				3, 
-				0|Objdetect.CASCADE_SCALE_IMAGE, 
+				0|CASCADE_SCALE_IMAGE, 
 				new Size(100, 100), 
 				new Size(500,500) );
 		
 		log.debug("Finished finding faces.");
-		return faces.toArray();
+		Rect[] faceArray = new Rect[faces.sizeof()];
+		for (int i = 0; i < faces.sizeof(); i++) {
+			faceArray[i] = faces.get(i);
+		}
+		return faceArray;
 	}
 }

@@ -1,20 +1,14 @@
 package us.superkill.mean_machine.imagetools;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.junit.Assert.assertNotNull;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Point;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.imgcodecs.Imgcodecs;
 
 import us.superkill.mean_machine.exceptions.FormatterTargetNotFound;
 
@@ -22,9 +16,9 @@ public class EyeLikeFacePreparerTest {
 	
 	@BeforeClass
 	public static void loadOpenCv() {
-		String pathToOpenCvLib = 
-				"/Users/ncassiani/Projects/MeanMachine/opencv/build/lib/";
-		System.load(pathToOpenCvLib + "libopencv_java310.so");
+//		String pathToOpenCvLib = 
+//				"/Users/ncassiani/Projects/MeanMachine/opencv/build/lib/";
+//		System.load(pathToOpenCvLib + "libopencv_java310.so");
 	}
 	
 	@Test
@@ -44,12 +38,11 @@ public class EyeLikeFacePreparerTest {
 	}
 	
 	private Mat getFaceImage(String fileName) {
-		BufferedImage image = null;
 		
 		ClassLoader classLoader = getClass().getClassLoader();
 		File file = new File(classLoader.getResource(fileName).getFile());
 		
-		Mat result = Imgcodecs.imread(file.getAbsolutePath());
+		Mat result = imread(file.getAbsolutePath());
 		
 		return result;
 	}

@@ -1,12 +1,13 @@
 package us.superkill.mean_machine.db;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bytedeco.javacpp.opencv_core.Mat;
 import org.hibernate.Session;
-import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 
 import us.superkill.mean_machine.imagetools.RecognizerPreparer;
 
@@ -43,6 +44,6 @@ public abstract class ImageSource {
 	}
 	
 	protected void saveImage(Mat image, String filename) {
-		Imgcodecs.imwrite(filename, image);
+		imwrite(filename, image);
 	}
 }

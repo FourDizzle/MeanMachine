@@ -1,7 +1,7 @@
 package us.superkill.mean_machine.imagetools;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Point;
 
 import us.superkill.mean_machine.exceptions.FormatterTargetNotFound;
 

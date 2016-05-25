@@ -1,7 +1,7 @@
 package us.superkill.mean_machine.detect;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Rect;
 
 public abstract class FaceDetector {
 	
