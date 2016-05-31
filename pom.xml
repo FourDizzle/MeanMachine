@@ -12,38 +12,15 @@
     <javacpp.version>1.2</javacpp.version>
     <opencv.version>3.1.0</opencv.version>
     <flandmark.version>1.07</flandmark.version>
+    <hibernate.version>5.1.0.Final</hibernate.version>
+    <log4j.version>2.5</log4j.version>
   </properties>
 
   <dependencies>
     <dependency>
-	  <groupId>com.restfb</groupId>
-	  <artifactId>restfb</artifactId>
-	  <version>1.22.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>5.1.0.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
-      <version>5.1.0.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.38</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>2.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>2.5</version>
+      <groupId>us.superkill.eyelike</groupId>
+      <artifactId>eye-like</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.bytedeco</groupId>
@@ -61,14 +38,36 @@
   	  <version>${opencv.version}-${javacpp.version}</version>
   	  <classifier>${platform.name}</classifier>
   	</dependency>
-    <!-- Will be using to find face landmarks soon
     <dependency>
-      <groupId>org.bytedeco.javacpp-presets</groupId>
-      <artifactId>flandmark</artifactId>
-      <version>${flandmark.version}-${javacpp.version}</version>
-      <classifier>${platform.name}</classifier>
-  	</dependency>
-  	-->
+	  <groupId>com.restfb</groupId>
+	  <artifactId>restfb</artifactId>
+	  <version>1.22.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.38</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
   	<dependency>
   	  <groupId>junit</groupId>
   	  <artifactId>junit</artifactId>
